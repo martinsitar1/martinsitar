@@ -188,4 +188,27 @@ p {
     -webkit-transform: scale(1.01, 1.01);
     transform: scale(1.01, 1.01);
   }
+
+/* Latest post hover effect */
+#latest-post {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+#latest-post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  background-color: #ff6719 !important;
+}
+
+.dark #latest-post:hover {
+  background-color: #ff6719 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  #latest-post:hover {
+    background-color: #ff6719 !important;
+  }
+}
   
