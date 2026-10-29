@@ -1,3 +1,4 @@
 [build]
-  publish = "."
-  command = ""
+  publish = "dist"
+  command = "mkdir -p dist && cp -R index.html CNAME css img js dist/"
+
