@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inconsolata&family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=2" />
 </head>
 <body class="bg-neutral-50 dark:bg-dark-bg">
 
@@ -36,35 +36,23 @@
   </div>
 
   <!-- Intro -->
-  <div class="w-full py-36 lg:py-52 lg:pb-16 feature dark:bg-dark-bg">
+  <div class="w-full pt-36 pb-8 lg:py-52 lg:pb-16 feature dark:bg-dark-bg">
     <div class="max-w-screen-md mx-5 md:mx-auto text-left">
       <h1 class="tracking-tight font-bold text-3xl titles">
         <span class="block xl:inline text-gray-900 dark:text-zinc-100">Hi, I'm Martin</span>
       </h1>
       <p class="mt-5 text-base text-lg sm:mx-auto md:text-lg lg:mx-0 text-gray-500 dark:text-gray-400">
-        I’m a product designer currently working on Core marketplace products at <a href="https://preply.com" target="_blank" rel="noopener" class="text-cyan-400 visited:text-blue-600">Preply</a>.<br>I've spent the last 9 years designing e-commerce tools that help businesses manage complexity and scale online. I enjoy taking photos and send out a <a href="https://martinsitar.substack.com" target="_blank" rel="noopener" class="text-blue-600 visited:text-blue-600">newsletter</a> where I share my thoughts on design &amp; technology.
+        I’m a product designer currently working on Core marketplace products at <a href="https://preply.com" target="_blank" rel="noopener" class="text-cyan-400 visited:text-blue-600">Preply</a>.<br>I've spent the last 9 years designing e-commerce tools that help businesses manage complexity and scale online. I enjoy taking photos and send out a <a href="https://martinsitar.substack.com" target="_blank" rel="noopener" class="text-blue-600 visited:text-blue-600">newsletter</a> where I share my thoughts on design &amp; technology.<br><br>Currently based in Sant Cugat del Vallès, Barcelona.
       </p>
-      <div class="inset-x-0 mt-8">
-        <a href="https://martinsitar.substack.com/p/a-very-long-surface-interval?r=53f4h" target="_blank" rel="noopener">
-          <div id="latest-post" class="relative flex items-center justify-between gap-4 rounded-lg bg-gray-600 dark:bg-stone-800 px-4 py-3 text-white shadow-lg overflow-hidden">
-            <p class="relative z-10">
-              Latest post: A long surface interval. Recall over recognition in a high-stakes interface.
-            </p>
-          </div>
-        </a>
-      </div>
     </div>
   </div>
 
-  <!-- Camera Roll -->
-  <div class="w-full pb-36">
-    <div class="max-w-screen-md mx-5 md:mx-auto text-left">
-      <div class="my-5">
-        <h4 class="text-gray-500 dark:text-gray-400 font-normal">
-          From my camera roll:
-        </h4>
+  <!-- 3D Town Diorama -->
+  <div class="w-full pb-24">
+    <div class="max-w-screen-md mx-5 md:mx-auto">
+      <div class="town-diorama-wrap" aria-label="3D miniature render of Sant Cugat with animated train, cars, pedestrians, and clouds">
+        <canvas id="town-diorama" class="town-diorama-canvas" width="1152" height="1105" style="display:block;width:100%;max-width:100%;height:auto;"></canvas>
       </div>
-      <img class="border-8 border-white shadow-lg" src="img/roll/nyc-dec.jpg" alt="From my camera roll" />
     </div>
   </div>
 
@@ -267,5 +255,6 @@
     </div>
   </footer>
 
+  <script src="js/town-diorama.js?v=3"></script>
 </body>
 </html>

@@ -37,12 +37,12 @@ a {
   text-decoration: inherit;
 }
 
-img, svg {
+img, svg, canvas {
   display: block;
   vertical-align: middle;
 }
 
-img {
+img, canvas {
   max-width: 100%;
   height: auto;
 }
@@ -147,6 +147,27 @@ img {
 .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
 .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
 .pb-36 { padding-bottom: 9rem; }
+.pt-36 { padding-top: 9rem; }
+.pb-8 { padding-bottom: 2rem; }
+.pb-24 { padding-bottom: 6rem; }
+
+/* 3D Town Diorama Container */
+.town-diorama-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 768px;
+  aspect-ratio: 1152 / 1105;
+  margin-top: 0.5rem;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.town-diorama-canvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
 
 /* Typography & Colors */
 .text-left { text-align: left; }
