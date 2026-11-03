@@ -13,16 +13,15 @@
   const W = 2048;
   const H = 2048;
 
-  // Tight viewport crop around the 3D miniature island so it fills the exact
-  // page content width without excess whitespace
+  // Tight viewport crop around the 3D miniature island with bottom headroom for the soft vertical drop shadow
   const VIEW_X = 44;
   const VIEW_Y = 124;
   const VIEW_W = 1860;
-  const VIEW_H = 1784;
+  const VIEW_H = 1884;
 
   // Efficient Retina canvas buffer size (1.5x of 768px content column)
   const CW = 1152;
-  const CH = 1105;
+  const CH = 1167;
   canvas.width = CW;
   canvas.height = CH;
 
@@ -38,8 +37,11 @@
   let darkReady = false;
 
   // Offscreen foreground occluder canvases (trees, Mercat Vell roof, upper forest)
+  // and pre-baked subtle vertical drop-shadow canvases for the 3D island object
   let fgLightCanvas = null;
   let fgDarkCanvas = null;
+  let dropLightCanvas = null;
+  let dropDarkCanvas = null;
 
   const darkMedia = window.matchMedia('(prefers-color-scheme: dark)');
   let isDark = darkMedia.matches;
@@ -70,10 +72,12 @@
   imgLight.onload = () => {
     lightReady = true;
     fgLightCanvas = buildForegroundOccluder(imgLight);
+    dropLightCanvas = buildIslandDropShadow(imgLight, false);
   };
   imgDark.onload = () => {
     darkReady = true;
     fgDarkCanvas = buildForegroundOccluder(imgDark);
+    dropDarkCanvas = buildIslandDropShadow(imgDark, true);
   };
 
   // Only fetch the active theme image on initial page load (~305KB)
@@ -191,6 +195,116 @@
     octx.putImageData(dstData, boxX, boxY);
 
     return off;
+  }
+
+  /**
+   * Builds a modern, subtle multi-layered vertical drop shadow (light source directly above,
+   * dx = 0, dy > 0) for the 3D miniature island using a fast 3-pass separable Gaussian blur
+   * on a compact offscreen canvas so it costs zero blur overhead during 60fps rendering.
+   */
+  function buildIslandDropShadow(sourceImg, dark) {
+    const DS_W = 360;
+    const DS_H = 380;
+    const scaleX = DS_W / W;
+    const scaleY = DS_H / (H + 120);
+
+    const tmp = document.createElement('canvas');
+    tmp.width = DS_W;
+    tmp.height = DS_H;
+    const tctx = tmp.getContext('2d');
+    tctx.drawImage(sourceImg, 0, 0, W * scaleX, H * scaleY);
+
+    const srcAlpha = new Float32Array(DS_W * DS_H);
+    const raw = tctx.getImageData(0, 0, DS_W, DS_H).data;
+    for (let y = 0; y < DS_H; y++) {
+      for (let x = 0; x < DS_W; x++) {
+        const p = y * DS_W + x;
+        const x2048 = x / scaleX;
+        // Taper the far-left and far-right tips so the vertical drop shadow stays well inside the container width
+        const leftTaper = Math.max(0, Math.min(1, (x2048 - 75) / 65));
+        const rightTaper = Math.max(0, Math.min(1, (1870 - x2048) / 65));
+        srcAlpha[p] = (raw[p * 4 + 3] / 255) * leftTaper * rightTaper;
+      }
+    }
+
+    function blurAlphaShifted(dy2048, radius2048) {
+      const dy = Math.round(dy2048 * scaleY);
+      const r = Math.max(1, Math.round(radius2048 * scaleX));
+      let cur = new Float32Array(DS_W * DS_H);
+      let next = new Float32Array(DS_W * DS_H);
+
+      // Vertical shift straight down (dx = 0, dy > 0)
+      for (let y = 0; y < DS_H; y++) {
+        const sy = y - dy;
+        if (sy < 0 || sy >= DS_H) continue;
+        const rowDst = y * DS_W;
+        const rowSrc = sy * DS_W;
+        for (let x = 0; x < DS_W; x++) {
+          cur[rowDst + x] = srcAlpha[rowSrc + x];
+        }
+      }
+
+      // 3-pass separable box blur with zero-boundary padding (no edge clamping)
+      const inv = 1 / (2 * r + 1);
+      for (let pass = 0; pass < 3; pass++) {
+        // Horizontal pass
+        for (let y = 0; y < DS_H; y++) {
+          const row = y * DS_W;
+          let sum = 0;
+          for (let k = -r; k <= r; k++) {
+            if (k >= 0 && k < DS_W) sum += cur[row + k];
+          }
+          for (let x = 0; x < DS_W; x++) {
+            next[row + x] = sum * inv;
+            const outIdx = x - r;
+            const inIdx = x + r + 1;
+            if (inIdx < DS_W) sum += cur[row + inIdx];
+            if (outIdx >= 0) sum -= cur[row + outIdx];
+          }
+        }
+        // Vertical pass
+        for (let x = 0; x < DS_W; x++) {
+          let sum = 0;
+          for (let k = -r; k <= r; k++) {
+            if (k >= 0 && k < DS_H) sum += next[k * DS_W + x];
+          }
+          for (let y = 0; y < DS_H; y++) {
+            cur[y * DS_W + x] = sum * inv;
+            const outIdx = y - r;
+            const inIdx = y + r + 1;
+            if (inIdx < DS_H) sum += next[inIdx * DS_W + x];
+            if (outIdx >= 0) sum -= next[outIdx * DS_W + x];
+          }
+        }
+      }
+      return cur;
+    }
+
+    // Tighter, cleaner vertical shadows that feather out well inside the container bounds
+    const l1 = blurAlphaShifted(10, 8);
+    const l2 = blurAlphaShifted(22, 16);
+    const l3 = blurAlphaShifted(36, 26);
+
+    const w1 = dark ? 0.24 : 0.06;
+    const w2 = dark ? 0.22 : 0.065;
+    const w3 = dark ? 0.16 : 0.05;
+
+    // Warm-neutral studio shadow tint in light mode; deep ambient black in dark mode
+    const sr = dark ? 0 : 24;
+    const sg = dark ? 0 : 20;
+    const sb = dark ? 0 : 16;
+
+    const outImg = tctx.createImageData(DS_W, DS_H);
+    const out = outImg.data;
+    for (let p = 0, i = 0; p < srcAlpha.length; p++, i += 4) {
+      const a = Math.min(1, l1[p] * w1 + l2[p] * w2 + l3[p] * w3);
+      out[i] = sr;
+      out[i + 1] = sg;
+      out[i + 2] = sb;
+      out[i + 3] = Math.round(a * 255);
+    }
+    tctx.putImageData(outImg, 0, 0);
+    return tmp;
   }
 
   // ============================================================================
@@ -1667,14 +1781,23 @@
       ? (fgDarkCanvas || fgLightCanvas)
       : (fgLightCanvas || fgDarkCanvas);
 
+    const activeDrop = isDark
+      ? (dropDarkCanvas || dropLightCanvas)
+      : (dropLightCanvas || dropDarkCanvas);
+
     if (activeImg) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, CW, CH);
 
-      // Map logical 2048x2048 island coordinates into the cropped 1152x1105 canvas
+      // Map logical 2048x2048 island coordinates into the cropped 1152x1167 canvas
       const scaleX = CW / VIEW_W;
       const scaleY = CH / VIEW_H;
       ctx.setTransform(scaleX, 0, 0, scaleY, -VIEW_X * scaleX, -VIEW_Y * scaleY);
+
+      // Layer -1: Modern, subtle vertical drop shadow straight down beneath the 3D island
+      if (activeDrop) {
+        ctx.drawImage(activeDrop, 0, 0, W, H + 120);
+      }
 
       // Layer 0: Base transparent 3D town render (light or dark)
       ctx.drawImage(activeImg, 0, 0, W, H);

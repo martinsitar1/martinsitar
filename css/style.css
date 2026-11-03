@@ -74,22 +74,21 @@ img, canvas {
 
 .prose {
   color: #374151;
-  max-width: 65ch;
   font-size: 1rem;
-  line-height: 1.75;
+  line-height: 1.5rem;
 }
 
 .prose :where(h4) {
   color: #111827;
   font-weight: 600;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
-  line-height: 1.5;
+  margin-top: 0.7rem;
+  margin-bottom: 0.7rem;
+  line-height: 1.5rem;
 }
 
 .prose :where(p) {
-  margin-top: 1.25em;
-  margin-bottom: 1.25em;
+  margin-top: 0.7rem;
+  margin-bottom: 0.7rem;
 }
 
 .prose > :where(:first-child) {
@@ -141,22 +140,28 @@ img, canvas {
 .bg-neutral-50 { background-color: rgb(250 250 250); }
 .fill-current { fill: currentColor; }
 
+.preply-icon {
+  display: inline-block;
+  vertical-align: -0.15em;
+  margin-right: 0.2rem;
+}
+
 .p-6 { padding: 1.5rem; }
 .py-36 { padding-top: 9rem; padding-bottom: 9rem; }
 .px-4 { padding-left: 1rem; padding-right: 1rem; }
 .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-.py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.py-6 { padding-top: 2.5rem; padding-bottom: 1.5rem; }
 .pb-36 { padding-bottom: 9rem; }
 .pt-36 { padding-top: 9rem; }
 .pb-8 { padding-bottom: 2rem; }
-.pb-24 { padding-bottom: 6rem; }
+.pb-24 { padding-bottom: 2rem; }
 
 /* 3D Town Diorama Container */
 .town-diorama-wrap {
   position: relative;
   width: 100%;
   max-width: 768px;
-  aspect-ratio: 1152 / 1105;
+  aspect-ratio: 1152 / 1167;
   margin-top: 0.5rem;
   user-select: none;
   -webkit-user-select: none;
@@ -175,8 +180,8 @@ img, canvas {
 
 .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
 .text-base { font-size: 1rem; line-height: 1.5rem; }
-.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.5rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.5rem; }
 
 .font-bold { font-weight: 700; }
 .font-normal { font-weight: 400; }
@@ -261,7 +266,7 @@ img, canvas {
 
   .md\:text-lg {
     font-size: 1.125rem;
-    line-height: 1.75rem;
+    line-height: 1.5rem;
   }
 }
 
@@ -292,7 +297,7 @@ img, canvas {
   }
 
   .lg\:py-52 {
-    padding-top: 13rem;
+    padding-top: 10rem;
     padding-bottom: 13rem;
   }
 
